@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import { config, integrationStatus } from "./config.js";
 import { ProviderError } from "./lib/http.js";
 import { registerAnalyticsRoutes } from "./routes/analytics.js";
+import { registerMetricsRoutes } from "./routes/metrics.js";
 import { registerRevenueRoutes } from "./routes/revenue.js";
 import { registerTursoRoutes } from "./routes/turso.js";
 
@@ -61,5 +62,6 @@ app.get("/v1/sources", async () => ({
 await registerRevenueRoutes(app);
 await registerTursoRoutes(app);
 await registerAnalyticsRoutes(app);
+await registerMetricsRoutes(app);
 
 await app.listen({ port: config.port, host: config.host });
