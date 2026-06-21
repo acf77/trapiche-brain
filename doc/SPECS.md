@@ -29,7 +29,7 @@ Trapiche is a **Brazilian deployment platform** (PaaS) for Node.js frontends and
 | **Dashboard** | `dashboard.trapiche.cloud` — deploy, billing, domains, DBs, AI Gateway |
 | **API** | `api.trapiche.cloud` — Go service, Turso (LibSQL) as source of truth |
 | **AI Gateway** | `ai.trapiche.cloud` — OpenAI-compatible LLM proxy, BRL metering |
-| **Payments** | Stripe (subscriptions) + Woovi Pix Automático (plan subs, Brazil) + AbacatePay (one-time PIX, gateway top-ups) |
+| **Payments** | Stripe (subscriptions) + Woovi (all PIX: plan Pix Automático + AI Gateway top-ups) + AbacatePay (hosted checkout links, legacy webhooks) |
 
 ### Pricing (public, BRL)
 
@@ -101,7 +101,9 @@ Snapshot pulled via Brain API with production credentials.
 
 ### Revenue (30 days) — updated 2026-06-18
 
-| Metric | Stripe | AbacatePay (PIX) | **Combined** |
+> **Note (2026-06-20):** New PIX creation (plan Pix Automático + AI Gateway top-ups) uses **Woovi**. AbacatePay figures below are historical through the Woovi migration; Brain revenue API still reads AbacatePay for legacy PIX/checkout stats.
+
+| Metric | Stripe | AbacatePay (PIX, historical) | **Combined** |
 |--------|--------|------------------|--------------|
 | **Revenue (30d)** | R$ 101,70 | R$ 143,00 | **R$ 244,70** |
 | **MRR** | R$ 89,70 | R$ 0 | **R$ 89,70** |

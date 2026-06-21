@@ -36,9 +36,11 @@ Woovi webhooks → POST /api/webhooks/woovi
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `WOOVI_APP_ID` | Yes | AppID from Woovi → Api/Plugins (Authorization header, no Bearer) |
-| `WOOVI_WEBHOOK_SECRET` | Prod recommended | HMAC-SHA1 validation (`X-OpenPix-Signature`) |
+| `WOOVI_WEBHOOK_SECRET` | Prod recommended | HMAC-SHA1 via `X-OpenPix-Signature` (fallback after RSA) |
 | `WOOVI_WEBHOOK_AUTHORIZATION` | Optional | Matches `Authorization` / `x-openpix-authorization` from webhook config |
 | `WOOVI_API_URL` | Optional | Default `https://api.woovi.com`; use `https://api.woovi-sandbox.com` for sandbox |
+
+Webhook auth order in code: (1) RSA `x-webhook-signature` (Woovi dashboard default), (2) HMAC `X-OpenPix-Signature` via `WOOVI_WEBHOOK_SECRET`, (3) optional authorization token. Woovi dashboard test pings (`evento: teste_webhook`) return 200 and are ignored.
 
 See also `api/api/.env.local.example`.
 
@@ -54,7 +56,7 @@ See also `api/api/.env.local.example`.
      - `OPENPIX:CHARGE_COMPLETED` — AI Gateway top-ups (one-time PIX)
      - `PIX_AUTOMATIC_COBR_COMPLETED` — plan subscription payments
      - `PIX_AUTOMATIC_REJECTED` — recurring authorization rejected
-   - Copy HMAC secret → `WOOVI_WEBHOOK_SECRET`
+   - Copy HMAC secret → `WOOVI_WEBHOOK_SECRET` (optional if using RSA signatures from Woovi)
 4. **Deploy** — add env vars to production API host and restart
 
 ---
@@ -66,7 +68,8 @@ See also `api/api/.env.local.example`.
 | `POST` | `/api/billing/pix` | User session | Pix Automático subscription (requires `customer`) |
 | `GET` | `/api/billing/pix/:id/status` | User session | Poll charge or subscription status |
 | `POST` | `/api/ai-gateway/top-up` | User session | One-time PIX via Woovi when `paymentMethod: "pix"` |
-| `POST` | `/api/webhooks/woovi` | Webhook secret | One-time + recurring PIX events |
+| `GET` | `/api/ai-gateway/top-up/:id/status` | User session | Poll top-up charge; reconciles missed webhooks |
+| `POST` | `/api/webhooks/woovi` | Webhook signature | One-time + recurring PIX events |
 
 ### Create Pix Automático (request)
 
@@ -108,9 +111,11 @@ See also `api/api/.env.local.example`.
 ## Dashboard UX
 
 1. Billing → change plan → **Pix Automático** (monthly or yearly)
-2. Form: CPF + address (Woovi requirement)
+2. Form: CPF + address (Woovi requirement); CEP auto-fills via ViaCEP
 3. QR code + copy-paste; poll until `PAID`
 4. Copy explains future renewals are automatic
+
+Note: the dashboard always shows the Pix option; if `WOOVI_APP_ID` is unset on the API, `POST /api/billing/pix` returns 503.
 
 ---
 
@@ -163,7 +168,6 @@ Manual smoke (sandbox or prod):
 
 - [ ] Brain revenue provider for Woovi (MRR currently Stripe + AbacatePay only)
 - [ ] Cancel Woovi subscription when user cancels in dashboard
-- [ ] CEP auto-fill (ViaCEP) in billing form
 - [ ] Production webhook registered and smoke-tested end-to-end
 
 ---
@@ -172,4 +176,5 @@ Manual smoke (sandbox or prod):
 
 - [Pix Automático — create](https://developers.woovi.com/docs/pix-automatic/pix-automatic-how-to-create)
 - [Pix Automático — webhooks](https://developers.woovi.com/docs/pix-automatic/webhooks/pix-automatic-webhooks)
+- [Webhook RSA signature validation](https://developers.woovi.com/docs/webhook/seguranca/webhook-signature-validation)
 - [Webhook HMAC validation](https://developers.woovi.com/docs/webhook/seguranca/webhook-hmac)

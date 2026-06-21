@@ -21,9 +21,9 @@
 
 - [x] Pull Stripe failure codes breakdown — `GET /v1/revenue/stripe/failures?days=30`
 - [ ] Identify if failures are card declines, 3DS, or duplicate retry artifacts
-- [ ] **AbacatePay recurring PIX for subs** — superseded for plan billing by Woovi; see [`doc/WOOVI_PIX_AUTOMATICO.md`](WOOVI_PIX_AUTOMATICO.md). AbacatePay still used for AI Gateway one-time PIX top-ups.
+- [ ] **AbacatePay recurring PIX for subs** — superseded for plan billing by Woovi; see [`doc/WOOVI_PIX_AUTOMATICO.md`](WOOVI_PIX_AUTOMATICO.md). AbacatePay remains for hosted checkout links and legacy webhook handling only — all PIX creation (plan + gateway top-ups) is Woovi.
 - [x] **Woovi Pix Automático for subs** — wired: `POST /api/billing/pix`, webhook, dashboard form + QR. Ops: register webhook + deploy env (see doc checklist).
-- [x] Verify PIX offered on dashboard billing — Pix Automático (monthly + yearly) when `WOOVI_APP_ID` set
+- [x] Verify PIX offered on dashboard billing — Pix Automático for monthly + yearly; dashboard always shows the option (API returns 503 if `WOOVI_APP_ID` unset)
 - [ ] Add dunning / retry messaging for failed subscription payments (dashboard + email)
 
 ### H2: Deploy failures (49,2% fail rate — **100% infra in last 30d**)
